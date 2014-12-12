@@ -72,8 +72,6 @@ public class GCMIntentService extends GCMBaseIntentService {
 		CharSequence contentText = (CharSequence) data.get("message");
         
         
-		Intent notificationIntent = new Intent(this, GCMIntentService.class);
-
 		Intent launcherintent = new Intent("android.intent.action.MAIN");
 		launcherintent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		//I'm sure there is a better way ...
@@ -136,14 +134,17 @@ public class GCMIntentService extends GCMBaseIntentService {
 			String ns = Context.NOTIFICATION_SERVICE;
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
 			mNotificationManager.notify(1, notification);
+
+			// sngmr
+			startService(new Intent(this, TimerIntentService.class));
+			// sngmr
         }
 
         JSONObject json = new JSONObject(data);
         systProp.setString("com.activate.gcm.last_data", json.toString());
         if (C2dmModule.getInstance() != null){
             C2dmModule.getInstance().sendMessage(data);
-        }
-	
+        }	
     }
 
 	@Override

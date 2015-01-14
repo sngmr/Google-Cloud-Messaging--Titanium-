@@ -23,13 +23,13 @@ public class AfterMessageIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent data) {
-        Log.d(LCAT, "AfterMessageIntentService.onHandleIntent");
+        Log.d(LCAT, "onHandleIntent");
 
         SystemClock.sleep(1500);
 
         Intent intent = new Intent();
         intent.setAction("MESSAGE_ARRIVE");
         sendBroadcast(intent);
-        Log.d(LCAT, "AfterMessageIntentService.sendBroadcast");
+        Log.d(LCAT, "sendBroadcast");
     }
 }

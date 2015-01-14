@@ -15,16 +15,16 @@ public class AfterMessageReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent data) {
-		Log.d(LCAT, "AfterMessageReceiver.onReceive");
+		Log.d(LCAT, "onReceive");
 		
 		Intent intent = new Intent(context, AlertDialogActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 		try {
 			pendingIntent.send();
-			Log.d(LCAT, "AfterMessageReceiver.pendingIntent.send");
+			Log.d(LCAT, "pendingIntent.send");
 		} catch (PendingIntent.CanceledException e) {
 			e.printStackTrace();
-			Log.e(LCAT, "PendingIntent.CanceledException");
+			Log.d(LCAT, "CanceledException");
 		}
 	}
 }

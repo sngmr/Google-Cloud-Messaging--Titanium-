@@ -14,11 +14,11 @@ import org.appcelerator.kroll.common.Log;
 import org.json.JSONObject;
 
 public class AlertDialogFragment extends DialogFragment {
-	private static final String LCAT = "AlertDialogActivity";
+	private static final String LCAT = "AlertDialogFragment";
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Log.e(LCAT, "AlertDialogFragment.onCreateDialog");
+		Log.e(LCAT, "onCreateDialog");
 
 		// Titaniumアプリから最後のメッセージを取得
 		TiProperties systProp = TiApplication.getInstance().getAppProperties();
@@ -58,11 +58,11 @@ public class AlertDialogFragment extends DialogFragment {
 			Dialog dialog = builder.create();
 			dialog.setCanceledOnTouchOutside(true);
 
-			Log.d(LCAT, "AlertDialogFragment.onCreateDialog Complete");
+			Log.e(LCAT, "onCreateDialog Complete");
 			return dialog;
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.d(LCAT, "AlertDialogFragment.onCreateDialog JSONParse Exception");
+			Log.e(LCAT, "onCreateDialog Exception");
 			return null;
 		}
 	}

@@ -23,7 +23,7 @@ import org.json.JSONObject;
 
 public class GCMIntentService extends GCMBaseIntentService {
 
-	private static final String LCAT = "C2DMReceiver";
+	private static final String LCAT = "GCMIntentService";
 
 	private static final String REGISTER_EVENT = "registerC2dm";
 	private static final String UNREGISTER_EVENT = "unregister";
@@ -85,9 +85,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 		// the next two lines initialize the Notification, using the
 		// configurations above
 
-        if(contentText==null){
+        if (contentText == null) {
             Log.d(LCAT, "Message received , no contentText so will make this silent");
-        }else{
+        } else {
             Log.d(LCAT, "creating notification ...");
 
             Notification notification = new Notification(icon, tickerText, when);
@@ -96,19 +96,17 @@ public class GCMIntentService extends GCMBaseIntentService {
 			CharSequence sound = (CharSequence) data.get("sound");
             
 			if("default".equals(sound)) {
-				Log.e(LCAT, "Notification: DEFAULT_SOUND");
+				Log.d(LCAT, "Notification: DEFAULT_SOUND");
                 notification.defaults |= Notification.DEFAULT_SOUND;
-			}
-			else if(sound != null) {
-                
-				Log.e(LCAT, "Notification: sound "+sound);
+			} else if(sound != null) {
+				Log.d(LCAT, "Notification: sound "+sound);
                 
 				String[] packagename = systProp.getString("com.activate.gcm.component", "").split("/");
                 
 				String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
 				String path = baseDir + "/"+ packagename[0] +"/sound/"+sound;
                 
-				Log.e(LCAT, path);
+				Log.d(LCAT, path);
                 
 				File file = new File(path);
 				
@@ -117,8 +115,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 				if (file.exists()) {
 					Uri soundUri = Uri.fromFile(file);
                     notification.sound = soundUri;
-				}
-				else {
+				} else {
                     notification.defaults |= Notification.DEFAULT_SOUND;
 				}
 			}

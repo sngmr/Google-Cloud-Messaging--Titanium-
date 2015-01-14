@@ -135,9 +135,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
 			mNotificationManager.notify(1, notification);
 
-			// sngmr
-			startService(new Intent(this, TimerIntentService.class));
-			// sngmr
+			// メッセージ到着後の後処理を行うIntentを起動
+			// ※Intentの設定がなければ空振りでOK
+			startService(new Intent(this, AfterMessageIntentService.class));
         }
 
         JSONObject json = new JSONObject(data);

@@ -28,7 +28,7 @@ public class AlertDialogFragment extends DialogFragment {
 		}
 
 		// その他情報を取得
-		String alertTitle = systProp.getString("com.activate.gcm.aftermessage_title", "");
+		String alertTitle = systProp.getString("com.activate.gcm.dialog_title", "");
 		final String[] packageNames = systProp.getString("com.activate.gcm.component", "").split("/");
 
 		try {

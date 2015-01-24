@@ -10,6 +10,7 @@ import org.appcelerator.kroll.common.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMBroadcastReceiver;
 import com.activate.gcm.C2dmModule;
+import com.activate.gcm.AlertDialogActivity;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -131,17 +132,32 @@ public class GCMIntentService extends GCMBaseIntentService {
 			String ns = Context.NOTIFICATION_SERVICE;
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
 			mNotificationManager.notify(1, notification);
-
-			// メッセージ到着後の後処理を行うIntentを起動
-			// ※Intentの設定がなければ空振りでOK
-			startService(new Intent(this, AfterMessageIntentService.class));
         }
 
         JSONObject json = new JSONObject(data);
         systProp.setString("com.activate.gcm.last_data", json.toString());
         if (C2dmModule.getInstance() != null){
             C2dmModule.getInstance().sendMessage(data);
-        }	
+        }
+
+        //
+        // Notification表示後にさらにDialogで注意喚起
+        //
+        if (contentText != null) {
+        	// Dialogタイトルがなければ追加Dialog無し
+        	String alertTitle = systProp.getString("com.activate.gcm.dialog_title", null);
+        	if (alertTitle != null) {
+        		Intent alertIntent = new Intent(context, AlertDialogActivity.class);
+        		PendingIntent alertPendingIntent = PendingIntent.getActivity(context, 0, alertIntent, 0);
+        		try {
+        			alertPendingIntent.send();
+        			Log.d(LCAT, "pendingIntent.send");
+        		} catch (PendingIntent.CanceledException e) {
+        			e.printStackTrace();
+        			Log.d(LCAT, "CanceledException");
+        		}
+        	}
+        }
     }
 
 	@Override

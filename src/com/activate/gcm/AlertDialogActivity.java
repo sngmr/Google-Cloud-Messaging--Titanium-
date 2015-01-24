@@ -25,6 +25,7 @@ public class AlertDialogActivity extends FragmentActivity {
 	public void onAttachedToWindow() {
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+            | WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	}
 }

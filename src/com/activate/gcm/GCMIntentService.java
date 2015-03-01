@@ -13,12 +13,15 @@ import com.activate.gcm.C2dmModule;
 import com.activate.gcm.AlertDialogActivity;
 
 import android.app.Notification;
+import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import org.json.JSONObject;
 
@@ -63,75 +66,58 @@ public class GCMIntentService extends GCMBaseIntentService {
 			data.put(eventKey, intent.getExtras().getString(key));
 		}
 
+		// Notificationメッセージから情報を取得
+		// ※以前はサウンドとバイブレーションがあったけど削除した
+
+		// アイコン
 		int icon = systProp.getInt("com.activate.gcm.icon", 0);
+		int iconBig = systProp.getInt("com.activate.gcm.bigicon", 0);
+		Bitmap largeIcon = null;
+		if (iconBig != 0) {
+			largeIcon = BitmapFactory.decodeResource(getResources(), iconBig);
+		}
+
 		//another way to get icon :
 		//http://developer.appcelerator.com/question/116650/native-android-java-module-for-titanium-doesnt-generate-rjava
-		CharSequence tickerText = (CharSequence) data.get("ticker");
-		long when = System.currentTimeMillis();
 
+		// Tickerテキスト
+		CharSequence tickerText = (CharSequence) data.get("ticker");
+
+		// タイトル・メッセージ
 		CharSequence contentTitle = (CharSequence) data.get("title");
 		CharSequence contentText = (CharSequence) data.get("message");
-        
-        
-		Intent launcherintent = new Intent("android.intent.action.MAIN");
-		launcherintent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		//I'm sure there is a better way ...
-		launcherintent.setComponent(ComponentName.unflattenFromString(systProp.getString("com.activate.gcm.component", "")));
-		//
-		launcherintent.addCategory("android.intent.category.LAUNCHER");
 
+        // 起動Intentを作成
+		Intent launcherIntent = new Intent("android.intent.action.MAIN");
+		launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		// I'm sure there is a better way ...
+		launcherIntent.setComponent(ComponentName.unflattenFromString(systProp.getString("com.activate.gcm.component", "")));
+		launcherIntent.addCategory("android.intent.category.LAUNCHER");
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launcherintent, 0);
-
-		// the next two lines initialize the Notification, using the
-		// configurations above
+		// PendinIntentを作成
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launcherIntent, 0);
 
         if (contentText == null) {
             Log.d(LCAT, "Message received , no contentText so will make this silent");
         } else {
-            Log.d(LCAT, "creating notification ...");
+            Log.d(LCAT, "Creating notification ...");
 
-            Notification notification = new Notification(icon, tickerText, when);
-			// Custom
-			CharSequence vibrate = (CharSequence) data.get("vibrate");
-			CharSequence sound = (CharSequence) data.get("sound");
-            
-			if("default".equals(sound)) {
-				Log.d(LCAT, "Notification: DEFAULT_SOUND");
-                notification.defaults |= Notification.DEFAULT_SOUND;
-			} else if(sound != null) {
-				Log.d(LCAT, "Notification: sound "+sound);
-                
-				String[] packagename = systProp.getString("com.activate.gcm.component", "").split("/");
-                
-				String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-				String path = baseDir + "/"+ packagename[0] +"/sound/"+sound;
-                
-				Log.d(LCAT, path);
-                
-				File file = new File(path);
-				
-				Log.i(TAG,"Sound exists : " + file.exists());
-                
-				if (file.exists()) {
-					Uri soundUri = Uri.fromFile(file);
-                    notification.sound = soundUri;
-				} else {
-                    notification.defaults |= Notification.DEFAULT_SOUND;
-				}
-			}
-			
-			if(vibrate != null) {
-				notification.defaults |= Notification.DEFAULT_VIBRATE;
-			}
-			
-			notification.defaults |= Notification.DEFAULT_LIGHTS;
-            
-			notification.flags = Notification.FLAG_AUTO_CANCEL;
-			notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-			String ns = Context.NOTIFICATION_SERVICE;
-			NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-			mNotificationManager.notify(1, notification);
+            // Notificationを作成
+            Notification.Builder builder = new Notification.Builder(this)
+            .setTicker(contentTitle)
+            .setContentTitle(contentTitle)
+            .setContentText(contentText)
+            .setSmallIcon(icon)
+            .setLargeIcon(largeIcon)
+            .setWhen(System.currentTimeMillis())
+            .setContentIntent(contentIntent)
+            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+            .setAutoCancel(true);
+
+            // NotificationManagerから通知
+            NotificationManager notificationManager = 
+            	(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);	// Service.NOTIFICATION_SERVICE
+            notificationManager.notify(1, builder.getNotification());
         }
 
         JSONObject json = new JSONObject(data);
@@ -144,11 +130,11 @@ public class GCMIntentService extends GCMBaseIntentService {
         // Notification表示後にさらにDialogで注意喚起
         //
         if (contentText != null) {
-        	// Dialogタイトルがなければ追加Dialog無し
+        	// Dialogタイトルがなければ追加Dialog無し（tiapp.xmlで定義）
         	String alertTitle = systProp.getString("com.activate.gcm.dialog_title", null);
         	if (alertTitle != null) {
         		Intent alertIntent = new Intent(context, AlertDialogActivity.class);
-        		PendingIntent alertPendingIntent = PendingIntent.getActivity(context, 0, alertIntent, 0);
+        		PendingIntent alertPendingIntent = PendingIntent.getActivity(context, 0, alertIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         		try {
         			alertPendingIntent.send();
         			Log.d(LCAT, "pendingIntent.send");

@@ -15,4 +15,4 @@ name: Gcm
 moduleid: com.activate.gcm
 guid: dd798359-e9aa-40a2-9014-46801b85c52f
 platform: android
-minsdk: 1.8.2
+minsdk: 3.2.3

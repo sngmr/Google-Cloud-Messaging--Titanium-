@@ -18,13 +18,16 @@ public class AlertDialogFragment extends DialogFragment {
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Log.e(LCAT, "onCreateDialog");
+		Log.d(LCAT, "onCreateDialog");
 
 		// Titaniumアプリから最後のメッセージを取得
 		TiProperties systProp = TiApplication.getInstance().getAppProperties();
-		String lastDataStr = systProp.getString("com.activate.gcm.last_data", null);
+		String lastDataStr = systProp.getString("com.activate.gcm.last_data_for_dialog", null);
 		if (lastDataStr == null) {
 			return null;
+		} else {
+			// データを消しておく
+			systProp.setString("com.activate.gcm.last_data_for_dialog", null);
 		}
 
 		// その他情報を取得
@@ -58,7 +61,7 @@ public class AlertDialogFragment extends DialogFragment {
 			Dialog dialog = builder.create();
 			dialog.setCanceledOnTouchOutside(true);
 
-			Log.e(LCAT, "onCreateDialog Complete");
+			Log.d(LCAT, "onCreateDialog Complete");
 			return dialog;
 		} catch (Exception e) {
 			e.printStackTrace();

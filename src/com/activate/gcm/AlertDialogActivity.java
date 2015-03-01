@@ -12,30 +12,22 @@ public class AlertDialogActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.e(LCAT, "onCreate");
+		Log.d(LCAT, "onCreate");
 
 		super.onCreate(savedInstanceState);
 		AlertDialogFragment fragment = new AlertDialogFragment();
 		fragment.show(getSupportFragmentManager(), "alert_dialog");
 		
-		Log.e(LCAT, "onCreate Complete");
+		Log.d(LCAT, "onCreate Complete");
 	}
 
 	@Override
 	public void onAttachedToWindow() {
-		Window window = getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		/*
-		window.addFlags(
-			WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON | 
-			WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-			WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-			WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-		*/
-		/*
-		window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-		          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-		          | WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		*/
+		// Window window = getWindow();
+		// window.addFlags(
+		// 	WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+		// 	WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+		// 	WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+		// 	WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 	}
 }

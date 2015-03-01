@@ -16,6 +16,7 @@ import android.app.Notification;
 import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -120,6 +121,7 @@ public class GCMIntentService extends GCMBaseIntentService {
             notificationManager.notify(1, builder.getNotification());
         }
 
+        // アプリ本体などで利用できるようにデータ保存
         JSONObject json = new JSONObject(data);
         systProp.setString("com.activate.gcm.last_data", json.toString());
         if (C2dmModule.getInstance() != null){
@@ -129,20 +131,29 @@ public class GCMIntentService extends GCMBaseIntentService {
         //
         // Notification表示後にさらにDialogで注意喚起
         //
-        if (contentText != null) {
-        	// Dialogタイトルがなければ追加Dialog無し（tiapp.xmlで定義）
-        	String alertTitle = systProp.getString("com.activate.gcm.dialog_title", null);
-        	if (alertTitle != null) {
-        		Intent alertIntent = new Intent(context, AlertDialogActivity.class);
-        		PendingIntent alertPendingIntent = PendingIntent.getActivity(context, 0, alertIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        		try {
-        			alertPendingIntent.send();
-        			Log.d(LCAT, "pendingIntent.send");
-        		} catch (PendingIntent.CanceledException e) {
-        			e.printStackTrace();
-        			Log.d(LCAT, "CanceledException");
-        		}
-        	}
+        // Dialogタイトルがなければ追加Dialog無し（tiapp.xmlで定義）
+        String alertTitle = systProp.getString("com.activate.gcm.dialog_title", null);
+        if (contentText != null && alertTitle != null) {
+    		// 追加Dialogが利用するデータを保存（ダイアログ表示時に消される）
+    		systProp.setString("com.activate.gcm.last_data_for_dialog", json.toString());
+
+    		// 端末ロック状態を取得
+    		final KeyguardManager keyManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+    		if (keyManager.inKeyguardRestrictedInputMode()) {
+    			// ロック状態：別のReceiverが毎回アンロックで動いてDialog表示用のデータがあればDialog表示する
+    			Log.d(LCAT, "Screen is Locked. No dialog showed. Try next launch.");
+    		} else {
+    			// ロックされてない：Dialogを表示する
+    			Intent alertIntent = new Intent(context, AlertDialogActivity.class);
+    			PendingIntent alertPendingIntent = PendingIntent.getActivity(context, 0, alertIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    			try {
+    				alertPendingIntent.send();
+    				Log.d(LCAT, "pendingIntent.send");
+    			} catch (PendingIntent.CanceledException e) {
+    				e.printStackTrace();
+    				Log.d(LCAT, "CanceledException");
+    			}
+    		}
         }
     }
 

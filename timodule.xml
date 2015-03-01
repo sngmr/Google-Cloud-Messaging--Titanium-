@@ -19,16 +19,12 @@
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 			
 			<application>
-				<service android:name="com.activate.gcm.GCMIntentService" />
-						
 				<receiver android:name="com.google.android.gcm.GCMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND">
-					
 					<!-- Start receiver on boot -->
 					<intent-filter>
 						<action android:name="android.intent.action.BOOT_COMPLETED"/>
 						<category android:name="android.intent.category.HOME"/>
 					</intent-filter>
-					
 					<!-- Receive the actual message -->
 					<intent-filter>
 						<action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -40,7 +36,14 @@
 						<category android:name="${tiapp.properties['id']}" />
 					</intent-filter>
 				</receiver>
-	
+				<receiver android:name="com.activate.gcm.AlertDialogReceiver">
+					<intent-filter>
+						<action android:name="android.intent.action.USER_PRESENT" />
+						<category android:name="${tiapp.properties['id']}" />
+					</intent-filter>
+				</receiver>
+				<service android:name="com.activate.gcm.GCMIntentService" />
+				<activity android:name="com.activate.gcm.AlertDialogActivity" android:theme="@android:style/Theme.Translucent" android:launchMode="singleInstance" />
 			</application>
         </manifest>
 	</android>
